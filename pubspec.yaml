@@ -1,13 +1,15 @@
-name: Aditus
+name: Adimus
 description: Getting words for project names
-version: 0.0.1
+version: 0.1.0
 homepage: https://github.com/Ampless/Aditus
 
 environment:
-  sdk: '>=2.8.1 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  html: any
+  html: ^0.15.0
+  html_search: ^0.1.1
+  schttp: ^2.0.0
 
 dev_dependencies:
-  pedantic: ^1.9.0
+  pedantic: ^1.11.0
