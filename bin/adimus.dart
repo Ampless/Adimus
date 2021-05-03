@@ -2,20 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
-import 'package:html_search/html_search.dart';
+import 'package:html_search/html_search.dart' as html;
 import 'package:schttp/schttp.dart';
 
 final http = ScHttpClient();
 
-List<dom.Element> searchHtml(List<dom.Element> rootNode, String className) =>
-    htmlSearchAllByPredicate(rootNode, (e) => e.className.contains(className));
+Iterable<dom.Element> searchHtml(List<dom.Element> root, String className) =>
+    html.search(root, (e) => e.className.contains(className));
 
-Iterable<String> htmlGetAnchors(List<dom.Element> root) =>
-    htmlSearchAllByPredicate(root, (e) => e.attributes.containsKey('href'))
-        .map((e) => '$PROTOCOL_AND_DOMAIN${e.attributes['href']}');
+Iterable<String> htmlGetAnchors(List<dom.Element> root) => html
+    .search(root, (e) => e.attributes.containsKey('href'))
+    .map((e) => '$PROTOCOL_AND_DOMAIN${e.attributes['href']}');
 
 dom.Element? htmlGetRightTr(List<dom.Element> root) =>
-    htmlSearchByPredicate(root, (e) => e.outerHtml.startsWith('<table>'));
+    html.searchFirst(root, (e) => e.outerHtml.startsWith('<table>'));
 
 Future<Iterable<String>> getBaseUrls(String url) async =>
     searchHtml(HtmlParser(await http.get(url)).parse().children, 'einruecken')
@@ -24,7 +24,7 @@ Future<Iterable<String>> getBaseUrls(String url) async =>
 Future<Map<String, String>> getRealHtml(Iterable<String> urls) async {
   final h = <String, String>{};
   for (final u in urls) {
-    print('Getting $u');
+    print(u);
     final elements = HtmlParser(await http.get(u)).parse().children;
     final subs = searchHtml(elements, 'p-substitute');
     if (subs.isNotEmpty)
@@ -39,7 +39,7 @@ const PROTOCOL_AND_DOMAIN = 'https://www.frag-caesar.de';
 const LIST_URL = '$PROTOCOL_AND_DOMAIN/lateinwoerterbuch/beginnend-mit-a.html';
 const CACHE_FILE = 'caesar.cache.adimus';
 
-void main(List<String> arguments) async {
+void main() async {
   var dict = <String, String>{};
   final cache = File(CACHE_FILE);
   if (await cache.exists())
